@@ -1,0 +1,9 @@
+conexão padrão no php com postgresql é:
+user: posgresq
+senha: 1234
+database: softexperteduardo
+
+Colocar a pasta 'EduardoRenz' no www ou htdocs
+
+
+existem produtos pré cadastrados para testar venda, por exemplo, com códigos 2, 3, 4, 11, 12

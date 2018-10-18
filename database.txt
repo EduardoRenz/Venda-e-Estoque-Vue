@@ -1,0 +1,654 @@
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: desafio; Type: DATABASE; Schema: -; Owner: desafio
+--
+
+
+CREATE ROLE desafio LOGIN
+   VALID UNTIL 'infinity';
+
+ALTER ROLE postgres WITH PASSWORD '1234' VALID UNTIL 'infinity';
+
+CREATE DATABASE SoftExpertEduardo WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'Portuguese_Brazil.1252' LC_CTYPE = 'Portuguese_Brazil.1252';
+
+
+ALTER DATABASE SoftExpertEduardo OWNER TO postgres;
+
+
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: produtos_categoria; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE public.produtos_categoria (
+    id integer NOT NULL,
+    categoria character varying(150) NOT NULL,
+    perc_tributacao numeric(6,2) DEFAULT 0.0 NOT NULL
+);
+
+
+ALTER TABLE public.produtos_categoria OWNER TO postgres;
+
+--
+-- Name: COLUMN produtos_categoria.categoria; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.produtos_categoria.categoria IS 'Categoria que o produto se enquadra';
+
+
+--
+-- Name: COLUMN produtos_categoria.perc_tributacao; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.produtos_categoria.perc_tributacao IS 'Percentual tributado do tipo de produto';
+
+
+--
+-- Name: categoria_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.categoria_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.categoria_id_seq OWNER TO postgres;
+
+--
+-- Name: categoria_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.categoria_id_seq OWNED BY public.produtos_categoria.id;
+
+
+--
+-- Name: cliente; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE public.cliente (
+    id integer NOT NULL,
+    cpf character(11) NOT NULL,
+    nome character varying(250),
+    telefone character(12)
+);
+
+
+ALTER TABLE public.cliente OWNER TO postgres;
+
+--
+-- Name: COLUMN cliente.id; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.cliente.id IS 'Id unico';
+
+
+--
+-- Name: COLUMN cliente.cpf; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.cliente.cpf IS 'CPF do cliente';
+
+
+--
+-- Name: COLUMN cliente.nome; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.cliente.nome IS 'Nome completo';
+
+
+--
+-- Name: COLUMN cliente.telefone; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.cliente.telefone IS 'Telefone';
+
+
+--
+-- Name: cliente_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.cliente_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.cliente_id_seq OWNER TO postgres;
+
+--
+-- Name: cliente_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.cliente_id_seq OWNED BY public.cliente.id;
+
+
+--
+-- Name: notas; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE public.notas (
+    id integer NOT NULL,
+    cliente_id integer NOT NULL,
+    data timestamp without time zone DEFAULT now() NOT NULL,
+    tipo_id integer
+);
+
+
+ALTER TABLE public.notas OWNER TO postgres;
+
+--
+-- Name: notas_detalhe; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE public.notas_detalhe (
+    id integer NOT NULL,
+    produto_id integer NOT NULL,
+    valor numeric NOT NULL,
+    desconto numeric DEFAULT 0.0,
+    perc_tributacao numeric(6,2) NOT NULL,
+    notas_id integer,
+    quantidade integer NOT NULL
+);
+
+
+ALTER TABLE public.notas_detalhe OWNER TO postgres;
+
+--
+-- Name: notas_detalhe_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.notas_detalhe_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.notas_detalhe_id_seq OWNER TO postgres;
+
+--
+-- Name: notas_detalhe_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.notas_detalhe_id_seq OWNED BY public.notas_detalhe.id;
+
+
+--
+-- Name: notas_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.notas_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.notas_id_seq OWNER TO postgres;
+
+--
+-- Name: notas_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.notas_id_seq OWNED BY public.notas.id;
+
+
+--
+-- Name: notas_tipo; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE public.notas_tipo (
+    id integer NOT NULL,
+    tipo character varying(150) NOT NULL,
+    descricao character varying(500)
+);
+
+
+ALTER TABLE public.notas_tipo OWNER TO postgres;
+
+--
+-- Name: COLUMN notas_tipo.tipo; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.notas_tipo.tipo IS 'tipo de movimentação (como venda, devolução, compra etc)';
+
+
+--
+-- Name: COLUMN notas_tipo.descricao; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.notas_tipo.descricao IS 'Descrição da movimentação';
+
+
+--
+-- Name: notas_tipo_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.notas_tipo_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.notas_tipo_id_seq OWNER TO postgres;
+
+--
+-- Name: notas_tipo_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.notas_tipo_id_seq OWNED BY public.notas_tipo.id;
+
+
+--
+-- Name: produtos; Type: TABLE; Schema: public; Owner: desafio; Tablespace: 
+--
+
+CREATE TABLE public.produtos (
+    id integer NOT NULL,
+    descricao character varying(300) NOT NULL,
+    preco numeric DEFAULT 0.0 NOT NULL,
+    categoria_id integer DEFAULT 0 NOT NULL,
+    data_cadastro date DEFAULT now(),
+    estoque integer DEFAULT 0
+);
+
+
+ALTER TABLE public.produtos OWNER TO desafio;
+
+--
+-- Name: COLUMN produtos.id; Type: COMMENT; Schema: public; Owner: desafio
+--
+
+COMMENT ON COLUMN public.produtos.id IS 'ID unico auto incrementavel';
+
+
+--
+-- Name: COLUMN produtos.descricao; Type: COMMENT; Schema: public; Owner: desafio
+--
+
+COMMENT ON COLUMN public.produtos.descricao IS 'Descricao do produto';
+
+
+--
+-- Name: COLUMN produtos.preco; Type: COMMENT; Schema: public; Owner: desafio
+--
+
+COMMENT ON COLUMN public.produtos.preco IS 'Preco bruto';
+
+
+--
+-- Name: COLUMN produtos.categoria_id; Type: COMMENT; Schema: public; Owner: desafio
+--
+
+COMMENT ON COLUMN public.produtos.categoria_id IS 'Categoria que pertence';
+
+
+--
+-- Name: produtos_id_seq; Type: SEQUENCE; Schema: public; Owner: desafio
+--
+
+CREATE SEQUENCE public.produtos_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.produtos_id_seq OWNER TO desafio;
+
+--
+-- Name: produtos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: desafio
+--
+
+ALTER SEQUENCE public.produtos_id_seq OWNED BY public.produtos.id;
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cliente ALTER COLUMN id SET DEFAULT nextval('public.cliente_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notas ALTER COLUMN id SET DEFAULT nextval('public.notas_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notas_detalhe ALTER COLUMN id SET DEFAULT nextval('public.notas_detalhe_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notas_tipo ALTER COLUMN id SET DEFAULT nextval('public.notas_tipo_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: desafio
+--
+
+ALTER TABLE ONLY public.produtos ALTER COLUMN id SET DEFAULT nextval('public.produtos_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.produtos_categoria ALTER COLUMN id SET DEFAULT nextval('public.categoria_id_seq'::regclass);
+
+
+--
+-- Name: categoria_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.categoria_id_seq', 38, true);
+
+
+--
+-- Data for Name: cliente; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.cliente (id, cpf, nome, telefone) VALUES (1, '00000000000', 'Cliente/Consumidor', NULL);
+
+
+--
+-- Name: cliente_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.cliente_id_seq', 1, true);
+
+
+--
+-- Data for Name: notas; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.notas (id, cliente_id, data, tipo_id) VALUES (40, 1, '2018-09-05 19:40:18.788506', 1);
+INSERT INTO public.notas (id, cliente_id, data, tipo_id) VALUES (41, 1, '2018-09-05 19:41:22.741932', 1);
+INSERT INTO public.notas (id, cliente_id, data, tipo_id) VALUES (42, 1, '2018-09-05 20:44:08.728294', 1);
+INSERT INTO public.notas (id, cliente_id, data, tipo_id) VALUES (43, 1, '2018-09-05 20:44:27.124284', 1);
+INSERT INTO public.notas (id, cliente_id, data, tipo_id) VALUES (44, 1, '2018-09-05 20:44:57.824149', 1);
+
+
+--
+-- Data for Name: notas_detalhe; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.notas_detalhe (id, produto_id, valor, desconto, perc_tributacao, notas_id, quantidade) VALUES (21, 2, 17.9, 0.0, 12.00, 40, 3);
+INSERT INTO public.notas_detalhe (id, produto_id, valor, desconto, perc_tributacao, notas_id, quantidade) VALUES (22, 17, 2, 0.0, 9.51, 41, 3);
+INSERT INTO public.notas_detalhe (id, produto_id, valor, desconto, perc_tributacao, notas_id, quantidade) VALUES (23, 20, 0.75, 0.0, 28.00, 42, 10);
+INSERT INTO public.notas_detalhe (id, produto_id, valor, desconto, perc_tributacao, notas_id, quantidade) VALUES (24, 20, 0.75, 0.0, 28.00, 43, 1);
+INSERT INTO public.notas_detalhe (id, produto_id, valor, desconto, perc_tributacao, notas_id, quantidade) VALUES (25, 20, 0.75, 0.0, 28.00, 44, 10);
+
+
+--
+-- Name: notas_detalhe_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.notas_detalhe_id_seq', 25, true);
+
+
+--
+-- Name: notas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.notas_id_seq', 44, true);
+
+
+--
+-- Data for Name: notas_tipo; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.notas_tipo (id, tipo, descricao) VALUES (1, 'Venda', 'Venda para Cliente');
+INSERT INTO public.notas_tipo (id, tipo, descricao) VALUES (2, 'Devolução', 'Devolução de mercadoria');
+
+
+--
+-- Name: notas_tipo_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.notas_tipo_id_seq', 2, true);
+
+
+--
+-- Data for Name: produtos; Type: TABLE DATA; Schema: public; Owner: desafio
+--
+
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (20, 'Miojo', 0.75, 38, '2018-09-05', 9);
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (11, 'Arroz', 4, 36, '2018-08-31', 3);
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (14, 'Feijão', 2, 36, '2018-08-31', 4);
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (12, 'Bife de Gado', 12.2, 24, '2018-08-31', 3);
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (4, 'Iogurte Light', 4.50, 16, '2018-08-28', 30);
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (15, 'Chocolate ao leite', 7, 37, '2018-08-31', 231);
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (13, 'Manteiga', 5, 16, '2018-08-31', 5);
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (2, 'Cerveja Renz American IPA', 17.90, 1, '2018-08-28', 37);
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (17, 'Mostarda em Pó', 2, 0, '2018-09-03', 0);
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (16, 'Refrigerante de cola', 5, 1, '2018-09-03', 3);
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (19, 'Pão Integral', 1.25, 38, '2018-09-05', 0);
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (18, 'Massa de Pastel', 1.5, 38, '2018-09-05', 20);
+INSERT INTO public.produtos (id, descricao, preco, categoria_id, data_cadastro, estoque) VALUES (3, 'Cerveja Nerd Imperial Stout  ', 21, 1, '2018-08-28', 7);
+
+
+--
+-- Data for Name: produtos_categoria; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.produtos_categoria (id, categoria, perc_tributacao) VALUES (36, 'Grãos', 25.00);
+INSERT INTO public.produtos_categoria (id, categoria, perc_tributacao) VALUES (37, 'Doces', 10.00);
+INSERT INTO public.produtos_categoria (id, categoria, perc_tributacao) VALUES (0, 'Produto Padrão', 9.51);
+INSERT INTO public.produtos_categoria (id, categoria, perc_tributacao) VALUES (38, 'Massas', 28.00);
+INSERT INTO public.produtos_categoria (id, categoria, perc_tributacao) VALUES (1, 'Bebidas', 12.00);
+INSERT INTO public.produtos_categoria (id, categoria, perc_tributacao) VALUES (16, 'Frios', 15.00);
+INSERT INTO public.produtos_categoria (id, categoria, perc_tributacao) VALUES (24, 'Carne', 4.00);
+
+
+--
+-- Name: produtos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: desafio
+--
+
+SELECT pg_catalog.setval('public.produtos_id_seq', 27, true);
+
+
+--
+-- Name: categoria_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY public.produtos_categoria
+    ADD CONSTRAINT categoria_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cliente_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY public.cliente
+    ADD CONSTRAINT cliente_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: notas_detalhe_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY public.notas_detalhe
+    ADD CONSTRAINT notas_detalhe_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: notas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY public.notas
+    ADD CONSTRAINT notas_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: notas_tipo_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY public.notas_tipo
+    ADD CONSTRAINT notas_tipo_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: produtos_pkey; Type: CONSTRAINT; Schema: public; Owner: desafio; Tablespace: 
+--
+
+ALTER TABLE ONLY public.produtos
+    ADD CONSTRAINT produtos_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: unique_categoria; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY public.produtos_categoria
+    ADD CONSTRAINT unique_categoria UNIQUE (categoria);
+
+
+--
+-- Name: notas_cliente_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notas
+    ADD CONSTRAINT notas_cliente_id_fkey FOREIGN KEY (cliente_id) REFERENCES public.cliente(id);
+
+
+--
+-- Name: notas_detalhe_notas_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notas_detalhe
+    ADD CONSTRAINT notas_detalhe_notas_id_fkey FOREIGN KEY (notas_id) REFERENCES public.notas(id);
+
+
+--
+-- Name: notas_detalhe_produto_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notas_detalhe
+    ADD CONSTRAINT notas_detalhe_produto_id_fkey FOREIGN KEY (produto_id) REFERENCES public.produtos(id);
+
+
+--
+-- Name: notas_tipo_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notas
+    ADD CONSTRAINT notas_tipo_id_fkey FOREIGN KEY (tipo_id) REFERENCES public.notas_tipo(id);
+
+
+--
+-- Name: produtos_categoria_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: desafio
+--
+
+ALTER TABLE ONLY public.produtos
+    ADD CONSTRAINT produtos_categoria_id_fkey FOREIGN KEY (categoria_id) REFERENCES public.produtos_categoria(id);
+
+
+--
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- Name: TABLE produtos_categoria; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE public.produtos_categoria FROM PUBLIC;
+REVOKE ALL ON TABLE public.produtos_categoria FROM postgres;
+GRANT ALL ON TABLE public.produtos_categoria TO postgres;
+GRANT ALL ON TABLE public.produtos_categoria TO desafio;
+
+
+--
+-- Name: COLUMN produtos_categoria.categoria; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL(categoria) ON TABLE public.produtos_categoria FROM PUBLIC;
+REVOKE ALL(categoria) ON TABLE public.produtos_categoria FROM postgres;
+GRANT ALL(categoria) ON TABLE public.produtos_categoria TO desafio;
+
+
+--
+-- Name: TABLE notas_tipo; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE public.notas_tipo FROM PUBLIC;
+REVOKE ALL ON TABLE public.notas_tipo FROM postgres;
+GRANT ALL ON TABLE public.notas_tipo TO postgres;
+GRANT ALL ON TABLE public.notas_tipo TO desafio;
+
+
+--
+-- Name: TABLE produtos; Type: ACL; Schema: public; Owner: desafio
+--
+
+REVOKE ALL ON TABLE public.produtos FROM PUBLIC;
+REVOKE ALL ON TABLE public.produtos FROM desafio;
+GRANT ALL ON TABLE public.produtos TO desafio;
+GRANT ALL ON TABLE public.produtos TO postgres;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
