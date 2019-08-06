@@ -2,7 +2,7 @@
 Simulação de um sistema de controle de estoques e vendas utilizando FrameWork Front-End VueJS alinhado com Back-End em PHP
 O sistema faz uso de CSS Grids para controle de Layout.
 
-##Tecnologias:
+## Tecnologias:
 - HTML
 - CSS
 - PHP
